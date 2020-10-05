@@ -29,18 +29,15 @@ TEMP_OUT_H = 0x2F
 INT_CFG    = 0X30
 INT_SRC    = 0X31
 
-
-"nice command"
-
 INT_THS_L  = 0x32
 INT_THS_H  = 0x33
 
 # connecting to the bus
-bus = SMBus(0x1e)
+bus = SMBus(1)
 
 # who am i information
-b = bus.read_byte_data(WHO_AM_I, 0)
-print("WHO AM I data:", b)
+b = bus.read_byte_data(DEV_ADDR, WHO_AM_I)
+print("WHO AM I data:", hex(b))
 
 # configuring the ctrl regs
 data1 = 0b00010000
@@ -53,3 +50,34 @@ bus.write_byte_data(DEV_ADDR, CTRL_REG2, data2)
 bus.write_byte_data(DEV_ADDR, CTRL_REG3, data3)
 bus.write_byte_data(DEV_ADDR, CTRL_REG4, data4)
 bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
+
+def read_compass():
+    x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
+    x_l = bus.read_byte_data(DEV_ADDR, OUT_X_L)
+    x = x_l*2**8 + x_l
+
+#    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
+#    print "X axis:", (x[0]*2**8 + x[1])
+
+    y_h = bus.read_byte_data(DEV_ADDR, OUT_Y_H)
+    y_l = bus.read_byte_data(DEV_ADDR, OUT_Y_L)
+    y = y_l*2**8 + y_l
+
+
+    z_h = bus.read_byte_data(DEV_ADDR, OUT_Z_H)
+    z_l = bus.read_byte_data(DEV_ADDR, OUT_Z_L)
+    z = z_l*2**8 + z_l
+
+    return x, y, z
+
+
+if __name__ == "__main__":
+    with open("pts.csv","w") as f:
+
+        for i in range(0, 100):
+
+            x,y,z = read_compass()
+            f.write([x, y, z])
+            print("X axis:", (x))
+            print("Y axis:", (y))
+            print("Z axis:", (z))
