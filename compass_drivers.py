@@ -29,6 +29,9 @@ TEMP_OUT_H = 0x2F
 INT_CFG    = 0X30
 INT_SRC    = 0X31
 
+
+"nice command"
+
 INT_THS_L  = 0x32
 INT_THS_H  = 0x33
 
