@@ -78,8 +78,6 @@ def read_compass():
 
 
 if __name__ == "__main__":
-    ssh = paramiko.SSHClient()
-    ssh.connect(172.20.25.209, username=pi, password=pi)
 
     with open("pts.txt", "w") as f:
         while True:
