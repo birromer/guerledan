@@ -72,12 +72,12 @@ def read_compass():
 
 
 if __name__ == "__main__":
-    with open("pts.csv","w") as f:
+    with open("pts.txt", "w") as f:
 
         for i in range(0, 100):
 
             x,y,z = read_compass()
-            f.write([x, y, z])
+            f.write("%d %d %d\n"%(x, y, z))
             print("X axis:", (x))
             print("Y axis:", (y))
             print("Z axis:", (z))
