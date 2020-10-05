@@ -38,6 +38,11 @@ def get_transl_m(x,y,z):
     return T
 
 
+def opt(pts):
+    P0 = np.array([[0], [0], [0], [1], [1], [1], [0], [0], [0]])
+    print(P0.T.shape)
+
+
 if __name__ == "__main__":
     pts = np.array([[0],[0],[0]])
     fig = plt.figure()
@@ -61,4 +66,6 @@ if __name__ == "__main__":
 
     pts = T @ pts
 
-    plot(ax, pts[0,:], pts[1,:], pts[2,:])
+    opt(pts)
+
+#    plot(ax, pts[0,:], pts[1,:], pts[2,:])

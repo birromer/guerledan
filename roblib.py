@@ -25,10 +25,10 @@ from matplotlib.collections import PatchCollection
 
 
 # Unicode https://en.wikipedia.org/wiki/List_of_Unicode_characters
-# αβδεθλΛμρτφψωΓ
+# αβδεθλΛμρτφ ψ ωΓ
+#
+#
 
-
-    
 def eulermat(φ,θ,ψ):
     Ad_i = adjoint(array([1,0,0]))
     Ad_j = adjoint(array([0,1,0]))
