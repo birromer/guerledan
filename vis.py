@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import roblib as rb
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import paramiko
 
 
 def plot(ax, x, y, z):
@@ -40,7 +40,7 @@ def get_transl_m(x,y,z):
 
 
 if __name__ == "__main__":
-    pts = rb.array([[0],[0],[0]])
+    pts = np.array([[0],[0],[0]])
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         for line in lines:
             col = np.fromstring(line, dtype=float, sep=' ')
             col = np.array([col]).T
-            pts = rb.hstack((pts, col))
+            pts = np.hstack((pts, col))
 
     pts = np.vstack((pts, np.ones(pts.shape[1])))
     pts = np.delete(pts, 0, 1)

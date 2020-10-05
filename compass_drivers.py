@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
+import paramiko
 
 # device address in the bus
 DEV_ADDR = 0x1e
@@ -77,6 +78,9 @@ def read_compass():
 
 
 if __name__ == "__main__":
+    ssh = paramiko.SSHClient()
+    ssh.connect(172.20.25.209, username=pi, password=pi)
+
     with open("pts.txt", "w") as f:
         while True:
             x,y,z = read_compass()
