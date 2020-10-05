@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def plot(x, y, z):
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
+def plot(ax, x, y, z):
     c = x + y + z
     ax.scatter(x, y, z, c=c)
 
 if __name__ == "__main__":
     pts = rb.array([[0],[0],[0]])
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
 
     with open("pts.txt", "r") as f:
         lines = f.readlines()
@@ -24,11 +24,10 @@ if __name__ == "__main__":
 
     pts = np.vstack((pts, np.ones(pts.shape[1])))
 
-    fig = rb.figure()
-    ax = rb.Axes3D(fig)
+    plot(ax, pts[0,:], pts[1,:], pts[2,:])
 
-#    rb.draw_axis3D(ax, 0, 0, 0, np.eye(3), 1)
-#    rb.plot3D(ax, pts, "blue", 2)
+    ax.set_xlabel("X axis")
+    ax.set_ylabel("Y axis")
+    ax.set_zlabel("Z axis")
 
-    plot(pts[0,:], pts[1,:], pts[2,:])
     plt.show()
