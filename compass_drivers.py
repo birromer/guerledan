@@ -54,19 +54,24 @@ bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
 def read_compass():
     x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
     x_l = bus.read_byte_data(DEV_ADDR, OUT_X_L)
-    x = x_l*2**8 + x_l
+    x = x_h*2**8 + x_l
+    if (x > 32767):
+        x = x - 65536
 
 #    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
 #    print "X axis:", (x[0]*2**8 + x[1])
 
     y_h = bus.read_byte_data(DEV_ADDR, OUT_Y_H)
     y_l = bus.read_byte_data(DEV_ADDR, OUT_Y_L)
-    y = y_l*2**8 + y_l
-
+    y = y_h*2**8 + y_l
+    if (y > 32767):
+        y = y - 65536
 
     z_h = bus.read_byte_data(DEV_ADDR, OUT_Z_H)
     z_l = bus.read_byte_data(DEV_ADDR, OUT_Z_L)
-    z = z_l*2**8 + z_l
+    z = z_h*2**8 + z_l
+    if (z > 32767):
+        z = z - 65536
 
     return x, y, z
 
