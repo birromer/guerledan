@@ -27,7 +27,8 @@ if __name__ == "__main__":
     fig = rb.figure()
     ax = rb.Axes3D(fig)
 
-    rb.draw_axis3D(ax, 0, 0, 0, np.eye(3), 1)
-    rb.plot3D(ax, pts, "blue", 2)
+#    rb.draw_axis3D(ax, 0, 0, 0, np.eye(3), 1)
+#    rb.plot3D(ax, pts, "blue", 2)
 
-    print(pts)
+    plot(pts[0,:], pts[1,:], pts[2,:])
+    plt.show()
