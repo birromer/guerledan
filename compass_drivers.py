@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-from smbus2 import SMBus
+from smbus import SMBus
+
+# device address in the bus
+DEV_ADDR = 0x1e
 
 # registers
 WHO_AM_I   = 0x0F
@@ -32,5 +35,18 @@ INT_THS_H  = 0x33
 # connecting to the bus
 bus = SMBus(0x1e)
 
-b = bus.read_byte_data(0x0F, 0)
-print(b)
+# who am i information
+b = bus.read_byte_data(WHO_AM_I, 0)
+print("WHO AM I data:", b)
+
+# configuring the ctrl regs
+data1 = 0b00010000
+data2 = 0b00000000
+data3 = 0b00000011
+data4 = 0b00010000
+data5 = 0b00010000
+bus.write_byte_data(DEV_ADDR, CTRL_REG1, data1)
+bus.write_byte_data(DEV_ADDR, CTRL_REG2, data2)
+bus.write_byte_data(DEV_ADDR, CTRL_REG3, data3)
+bus.write_byte_data(DEV_ADDR, CTRL_REG4, data4)
+bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
