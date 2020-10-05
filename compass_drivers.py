@@ -41,7 +41,7 @@ b = bus.read_byte_data(DEV_ADDR, WHO_AM_I)
 print("WHO AM I data:", hex(b))
 
 # configuring the ctrl regs
-data1 = 0b10101000
+data1 = 0b10111100
 data2 = 0b00000000
 data3 = 0b00000000
 data4 = 0b00000100
@@ -78,8 +78,6 @@ def read_compass():
 
 
 if __name__ == "__main__":
-    ssh = paramiko.SSHClient()
-    ssh.connect(172.20.25.209, username=pi, password=pi)
 
     with open("pts.txt", "w") as f:
         while True:
