@@ -63,13 +63,11 @@ def opt(pt, p):
 
 def opt2(pt, x1, xm1, x2, x3):
     A = np.zeros((3,3))
-    xv = np.array([x1,x2,x3])
-    beta = 46000
+    beta = 0.0000047
 
     b = -(x1 + xm1)/2
 
     n_pts = pt.shape[1]
-    print(n_pts)
 
     for i in range(n_pts):
         pt[0,i] = pt[0,i] + b[0]

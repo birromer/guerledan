@@ -88,6 +88,6 @@ if __name__ == "__main__":
 
     with open("pts.txt", "w") as f:
         while True:
-            x,y,z = read_compass()
+            x, y, z = read_compass()
             f.write("%d %d %d\n"%(x, y, z))
             print("X:", x, "Y:", y, "Z:", z)

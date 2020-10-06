@@ -51,13 +51,20 @@ if __name__ == "__main__":
 #        ty = y - cy
 #        tx = x - cx
 
-        psi = np.arctan2(opt_pt[0], opt_pt[1])
+        psi = np.arctan2(opt_pt[1], opt_pt[0])
         error = sawtooth(psi - psibar)
         n = abs(norm(error))
 
-        print("error: " + str(n))
+        print("error: " + str(error))
 
-        sp_m = 35
-        ardudrv.send_arduino_cmd_motor(serial_arduino, n* sp_m, (1 - n) * sp_m)
+        def bla(x):
+            if x > 0.5:
+                return 1
+            else:
+                return 0
+
+        sp_m = 60
+
+        ardudrv.send_arduino_cmd_motor(serial_arduino, bla(n) * sp_m, (1 - bla(n)) * sp_m)
 
         time.sleep(0.25)
