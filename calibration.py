@@ -42,10 +42,10 @@ def get_transl_m(x,y,z):
 
     return T
 
-
-def opt(x, pts, p):
-    p4, p5, p6 = p[3], p[4], p[5]
+def opt(pt, p):
     p1, p2, p3 = p[0], p[1], p[2]
+    p4, p5, p6 = p[3], p[4], p[5]
+    x, y, z = pt[0], pt[1], pt[2]
 
     fp_1 = np.array([
         [p4, 0, 0],
@@ -54,13 +54,12 @@ def opt(x, pts, p):
     ], dtype=float)
 
     fp_2 = np.array([
-        pts[0,:] - p1,
-        pts[1,:] - p2,   # mudar pq iss ja deveria ser a aplicação direta nos pontos, nao estou gerando uma matriz itermediaria
-        pts[2,:] - p3
+        x - p1,
+        y - p2,
+        z - p3
     ], dtype=float)
 
     return fp_1 @ fp_2
-
 
 if __name__ == "__main__":
     pts = np.array([[0],[0],[0]])
@@ -74,7 +73,7 @@ if __name__ == "__main__":
             col = np.array([col]).T
             pts = np.hstack((pts, col))
 
-#    pts = np.vstack((pts, np.ones(pts.shape[1])))
+
     pts = np.delete(pts, 0, 1)
     print(pts)
 
@@ -93,13 +92,12 @@ if __name__ == "__main__":
 
     T = get_transl_m(cx,cy,cz)
 
-    opt_m = opt([0,0,0], pts, p)
-#    print(opt_m.shape)
-#    print(pts.shape)
+    opt_pts = pts
 
-#    pts = opt_m.T @ pts
-    pts =T @ pts
 
-#    print(pts.shape)
+    opt_pts = opt(pts, p)
 
-    plot(ax, pts[0,:], pts[1,:], pts[2,:])
+    opt_pts = np.vstack((opt_pts, np.ones(pts.shape[1])))
+    opt_pts = T @ opt_pts
+
+    plot(ax, opt_pts[0,:], opt_pts[1,:], opt_pts[2,:])

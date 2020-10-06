@@ -2,6 +2,7 @@
 
 import roblib as rb
 from north import norm
+import time
 
 
 def g(x):
@@ -28,9 +29,12 @@ def f(x,u):
 
 if __name__ == "__main__":
     ax = rb.init_figure(-30,30, -30,30)
+    t0 = 0
+    tf = 1
+    dt = 0.1
 
     psibar = 0
-    dt = 0.01
+
     x = rb.array([
         [3],        # x
         [9],        # y
@@ -38,7 +42,7 @@ if __name__ == "__main__":
         [100.1]     # speed
     ])
 
-    for t in rb.arange(0,1,dt):
+    for t in rb.arange(t0, tf, dt):
         rb.clear(ax)
 #        psi = rb.arctan2(x[1], x[2])
         psi = x[2]
@@ -58,6 +62,6 @@ if __name__ == "__main__":
 
         x = x + dt*f(x, u)
         print("x:", x)
-        print("t:", t)
 
         rb.draw_tank(x, 'red')
+        time.sleep(dt)
