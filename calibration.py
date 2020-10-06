@@ -55,17 +55,31 @@ if __name__ == "__main__":
             col = np.array([col]).T
             pts = np.hstack((pts, col))
 
-    pts = np.vstack((pts, np.ones(pts.shape[1])))
+#    pts = np.vstack((pts, np.ones(pts.shape[1])))
     pts = np.delete(pts, 0, 1)
     print(pts)
 
-    cx, cy, cz = get_center(pts)
+    cx, cy, cz, lx, ly, lz = get_center_and_len(pts)
     print("cx:", cx, "cy:", cy, "cz:", cz)
+    print("lx:", lx, "ly:", ly, "lz:", lz)
+
+    p = np.array([
+        [cx],
+        [cy],
+        [cz],
+        [lx],
+        [ly],
+        [lz]
+    ])
 
     T = get_transl_m(cx,cy,cz)
 
-    pts = T @ pts
+    opt_m = opt([0,0,0], pts, p)
+    print(opt_m.shape)
+    print(pts.shape)
 
-    opt(pts)
+    pts = opt_m.T @ pts
 
-#    plot(ax, pts[0,:], pts[1,:], pts[2,:])
+    print(pts.shape)
+
+    plot(ax, pts[0,:], pts[1,:], pts[2,:])
