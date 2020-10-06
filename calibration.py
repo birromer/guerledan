@@ -61,6 +61,29 @@ def opt(pt, p):
 
     return fp_1 @ fp_2
 
+
+def opt2(pt, x1, xm1, x2, x3):
+    A = np.zeros((3,3))
+    beta = 4600
+
+    b = (x1 - xm1)/beta
+
+    pt[0,:] = pt[0,:] + b[0]
+    pt[1,:] = pt[1,:] + b[1]
+    pt[2,:] = pt[2,:] + b[2]
+    print(pt)
+
+
+    A[:,0] = (x1 + b)/beta
+    A[:,1] = (x2 + b)/beta
+    A[:,2] = (x3 + b)/beta
+
+    opt_pt = np.linalg.inv(A) @ pt
+
+    # inv(A) * (pt + b)
+
+    return opt_pt
+
 if __name__ == "__main__":
     pts = np.array([[0],[0],[0]])
     fig = plt.figure()
@@ -75,7 +98,6 @@ if __name__ == "__main__":
 
 
     pts = np.delete(pts, 0, 1)
-    print(pts)
 
     cx, cy, cz, lx, ly, lz = get_center_and_len(pts)
     print("cx:", cx, "cy:", cy, "cz:", cz)
@@ -92,12 +114,15 @@ if __name__ == "__main__":
 
     T = get_transl_m(cx,cy,cz)
 
-    opt_pts = pts
+    opt_pts1 = opt(pts, p)
+    opt_pts1 = np.vstack((opt_pts1, np.ones(pts.shape[1])))
+    opt_pts1 = T @ opt_pts1
 
+    x1 = np.array([900, -3950, 5540])
+    xm1 = np.array([7050, -2950, 5400])
+    x2 = np.array([4600, -3700, 2440])
+    x3 = np.array([3950, -3450, 2300])
 
-    opt_pts = opt(pts, p)
+    opt_pts2 = opt2(pts, x1, xm1, x2, x3)
 
-    opt_pts = np.vstack((opt_pts, np.ones(pts.shape[1])))
-    opt_pts = T @ opt_pts
-
-    plot(ax, opt_pts[0,:], opt_pts[1,:], opt_pts[2,:])
+    plot(ax, opt_pts2[0,:], opt_pts2[1,:], opt_pts2[2,:])

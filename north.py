@@ -14,7 +14,6 @@ def sawtooth(x):
 def opt(pt, p):
     p1, p2, p3 = p[0], p[1], p[2]
     p4, p5, p6 = p[3], p[4], p[5]
-  
     x, y, z = pt[0], pt[1], pt[2]
 
     fp_1 = np.array([
@@ -28,9 +27,8 @@ def opt(pt, p):
         y - p2,
         z - p3
     ], dtype=float)
-    print(fp_2)
 
-    return fp_1 * fp_2
+    return fp_1 @ fp_2
 
 if __name__ == "__main__":
     cx, cy, cz = 4038.0, -3357.5, 5237.5
