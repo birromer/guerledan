@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import roblib as rb
-from north import norm
+import utils.roblib as rb
+from orientation import norm
 import time
 
 

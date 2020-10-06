@@ -1,6 +1,6 @@
 import time
-import arduino_driver_py3 as ardudrv
-import compass_drivers as compass
+import drivers.arduino_driver_py3 as ardudrv
+import drivers.compass_drivers as compass
 import numpy as np
 from math import pi
 
