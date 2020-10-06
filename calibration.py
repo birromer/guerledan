@@ -92,7 +92,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
-    with open("pts.txt", "r") as f:
+    with open("data/pts.txt", "r") as f:
         lines = f.readlines()
         for line in lines:
             col = np.fromstring(line, dtype=float, sep=' ')

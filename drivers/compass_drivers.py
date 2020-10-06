@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     init_compass()
 
-    with open("pts.txt", "w") as f:
+    with open("../data/pts.txt", "w") as f:
         while True:
             x, y, z = read_compass()
             f.write("%d %d %d\n"%(x, y, z))
