@@ -68,9 +68,14 @@ def opt2(pt, x1, xm1, x2, x3):
 
     b = -(x1 + xm1)/2
 
-    pt[0,:] = pt[0,:] + b[0]
-    pt[1,:] = pt[1,:] + b[1]
-    pt[2,:] = pt[2,:] + b[2]
+    for i in range(len(pt[0,:])):
+        pt[0,i] = pt[0,i] + b[0]
+
+    for i in range(len(pt[1,:])):
+        pt[1,i] = pt[1,i] + b[1]
+
+    for i in range(len(pt[2,:])):
+        pt[2,i] = pt[2,i] + b[2]
 
     A[:,0] = (x1 + b)/beta
     A[:,1] = (x2 + b)/beta
