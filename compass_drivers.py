@@ -32,6 +32,10 @@ INT_THS_L  = 0x32
 INT_THS_H  = 0x33
 
 
+# connecting to the bus
+bus = SMBus(1)
+
+
 # who am i information
 def who_am_i():
     b = bus.read_byte_data(DEV_ADDR, WHO_AM_I)
@@ -78,9 +82,6 @@ def read_compass():
 
 
 if __name__ == "__main__":
-    # connecting to the bus
-    bus = SMBus(1)
-
     who_am_i()
 
     init_compass()

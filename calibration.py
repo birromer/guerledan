@@ -2,7 +2,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot(ax, x, y, z):
@@ -59,7 +58,7 @@ def opt(pt, p):
         z - p3
     ], dtype=float)
 
-    return fp_1 @ fp_2
+    return np.matmul(fp_1, fp_2)
 
 
 def opt2(pt, x1, xm1, x2, x3):
@@ -72,18 +71,15 @@ def opt2(pt, x1, xm1, x2, x3):
     pt[0,:] = pt[0,:] + b[0]
     pt[1,:] = pt[1,:] + b[1]
     pt[2,:] = pt[2,:] + b[2]
-    print(pt)
-
 
     A[:,0] = (x1 + b)/beta
     A[:,1] = (x2 + b)/beta
     A[:,2] = (x3 + b)/beta
 
-    opt_pt = np.linalg.inv(A) @ pt
-
-    print("A:", A)
+    opt_pt = np.matmul(np.linalg.inv(A), pt)
 
     return opt_pt
+
 
 if __name__ == "__main__":
     pts = np.array([[0],[0],[0]])
@@ -97,27 +93,25 @@ if __name__ == "__main__":
             col = np.array([col]).T
             pts = np.hstack((pts, col))
 
-
     pts = np.delete(pts, 0, 1)
 
     cx, cy, cz, lx, ly, lz = get_center_and_len(pts)
     print("cx:", cx, "cy:", cy, "cz:", cz)
     print("lx:", lx, "ly:", ly, "lz:", lz)
 
-    p = np.array([
-        [cx],
-        [cy],
-        [cz],
-        [lx],
-        [ly],
-        [lz]
-    ])
-
-    T = get_transl_m(cx,cy,cz)
-
-    opt_pts1 = opt(pts, p)
-    opt_pts1 = np.vstack((opt_pts1, np.ones(pts.shape[1])))
-    opt_pts1 = T @ opt_pts1
+#    p = np.array([
+#        [cx],
+#        [cy],
+#        [cz],
+#        [lx],
+#        [ly],
+#        [lz]
+#    ])
+#    T = get_transl_m(cx,cy,cz)
+#    opt_pts1 = opt(pts, p)
+#    opt_pts1 = np.vstack((opt_pts1, np.ones(pts.shape[1])))
+#    opt_pts1 = np.matmul(T, opt_pts1)
+#    plot(ax, opt_pts1[0,:], opt_pts1[1,:], opt_pts1[2,:])
 
     x1 = np.array([900, -3950, 5540])
     xm1 = np.array([7050, -2950, 5400])
@@ -125,6 +119,4 @@ if __name__ == "__main__":
     x3 = np.array([3950, -3450, 2300])
 
     opt_pts2 = opt2(pts, x1, xm1, x2, x3)
-
     plot(ax, opt_pts2[0,:], opt_pts2[1,:], opt_pts2[2,:])
-#    plot(ax, opt_pts1[0,:], opt_pts1[1,:], opt_pts1[2,:])
