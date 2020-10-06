@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-
 import numpy as np
 import matplotlib.pyplot as plt
-
 
 def plot(ax, x, y, z):
     c = x + y + z
@@ -11,7 +9,6 @@ def plot(ax, x, y, z):
     ax.set_ylabel("Y axis")
     ax.set_zlabel("Z axis")
     plt.show()
-
 
 def get_center_and_len(pts):
     max_x = max(pts[0,:])
@@ -30,7 +27,6 @@ def get_center_and_len(pts):
     l_z = (max_z - min_z)
 
     return c_x, c_y, c_z, l_x, l_y, l_z
-
 
 def get_transl_m(x,y,z):
     T = np.eye(4)
@@ -59,7 +55,6 @@ def opt(pt, p):
     ], dtype=float)
 
     return np.matmul(fp_1, fp_2)
-
 
 def opt2(pt, x1, xm1, x2, x3):
     A = np.zeros((3,3))
