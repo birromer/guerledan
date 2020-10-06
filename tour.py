@@ -8,7 +8,7 @@ def g(x):
     return rb.arctan2(x[1], x[0])  # psi
 
 def f(x,u):
-    p1, p2, p3 = 1, 1, 1  # calibrate later
+    p1, p2, p3 = 0.1, 0.2, 0.1  # calibrate later
 
     x1, x2, x3, x4 = x[0], x[1], x[2], x[3]
     u1, u2 = u[0], u[1]
@@ -19,41 +19,45 @@ def f(x,u):
     x4dot = p2 * (u1 + u2) - p3 * abs(x4) * x4
 
     return rb.array([
-        [x1dot],
-        [x2dot],
-        [x3dot],
-        [x4dot],
+        x1dot,
+        x2dot,
+        x3dot,
+        x4dot,
     ])
 
 
-def sim():
+if __name__ == "__main__":
+    ax = rb.init_figure(-30,30, -30,30)
+
+    psibar = 0
     dt = 0.01
     x = rb.array([
-        [0],        # x
-        [0],        # y
-        [0],        # speed
-        [0.1]       # heading
+        [3],        # x
+        [9],        # y
+        [10.4],     # heading
+        [100.1]     # speed
     ])
 
-    for t in rb.arange(0,10,dt):
-        psi = rb.arctan2(x[2], x[3])
+    for t in rb.arange(0,1,dt):
+        rb.clear(ax)
+#        psi = rb.arctan2(x[1], x[2])
+        psi = x[2]
 
         error = rb.sawtooth(psi - psibar)
+        print("error = ", error)
         error_norm = norm(error)
 
         print(error_norm*50)
 
         u = rb.array([
-            50 * error_norm,
-            50 * (1 - error_norm)
+            [1],
+            [1]
+#            50 * error_norm,
+#            50 * (1 - error_norm)
         ])
 
-
         x = x + dt*f(x, u)
-        print(x)
+        print("x:", x)
+        print("t:", t)
 
-
-
-if __name__ == "__main__":
-    psibar = 0
-    sim()
+        rb.draw_tank(x, 'red')
