@@ -13,7 +13,8 @@ def plot(ax, x, y, z):
     ax.set_zlabel("Z axis")
     plt.show()
 
-def get_center(pts):
+
+def get_center_and_len(pts):
     max_x = max(pts[0,:])
     min_x = min(pts[0,:])
     max_y = max(pts[1,:])
@@ -25,7 +26,11 @@ def get_center(pts):
     c_y = (min_y + max_y)/2
     c_z = (min_z + max_z)/2
 
-    return c_x, c_y, c_z
+    l_x = (max_x - min_x)
+    l_y = (max_y - min_y)
+    l_z = (max_z - min_z)
+
+    return c_x, c_y, c_z, l_x, l_y, l_z
 
 
 def get_transl_m(x,y,z):
@@ -38,9 +43,23 @@ def get_transl_m(x,y,z):
     return T
 
 
-def opt(pts):
-    P0 = np.array([[0], [0], [0], [1], [1], [1], [0], [0], [0]])
-    print(P0.T.shape)
+def opt(x, pts, p):
+    p4, p5, p6 = p[3], p[4], p[5]
+    p1, p2, p3 = p[0], p[1], p[2]
+
+    fp_1 = np.array([
+        [p4, 0, 0],
+        [0, p5, 0],
+        [0, 0, p6]
+    ], dtype=float)
+
+    fp_2 = np.array([
+        pts[0,:] - p1,
+        pts[1,:] - p2,   # mudar pq iss ja deveria ser a aplicação direta nos pontos, nao estou gerando uma matriz itermediaria
+        pts[2,:] - p3
+    ], dtype=float)
+
+    return fp_1 @ fp_2
 
 
 if __name__ == "__main__":
@@ -75,11 +94,12 @@ if __name__ == "__main__":
     T = get_transl_m(cx,cy,cz)
 
     opt_m = opt([0,0,0], pts, p)
-    print(opt_m.shape)
-    print(pts.shape)
+#    print(opt_m.shape)
+#    print(pts.shape)
 
-    pts = opt_m.T @ pts
+#    pts = opt_m.T @ pts
+    pts =T @ pts
 
-    print(pts.shape)
+#    print(pts.shape)
 
     plot(ax, pts[0,:], pts[1,:], pts[2,:])
