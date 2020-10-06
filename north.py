@@ -1,7 +1,6 @@
 import time
 import arduino_driver_py3 as ardudrv
 import compass_drivers as compass
-from calibration import opt2
 import numpy as np
 from math import pi
 
@@ -11,6 +10,20 @@ def norm(x):
 def sawtooth(x):
     return (x+pi)%(2*pi)-pi
 
+def opt2(pt, x1, xm1, x2, x3):
+    A = np.zeros((3,3))
+    xv = np.array([x1,x2,x3])
+    beta = 0.0000047
+
+    b = -(x1 + xm1)/2
+
+    A[:,0] = (x1 + b)/beta
+    A[:,1] = (x2 + b)/beta
+    A[:,2] = (x3 + b)/beta
+
+    opt_pt = np.matmul(np.linalg.inv(A), (pt + b))
+
+    return opt_pt
 
 if __name__ == "__main__":
 #    cx, cy, cz = 4038.0, -3357.5, 5237.5
@@ -32,25 +45,19 @@ if __name__ == "__main__":
         x, y, z = compass.read_compass()
         pt = np.array(([x, y, z]))
 
-        print("pt:", pt)
         opt_pt = opt2(pt, x1, xm1, x2, x3)
-        print("pt:", opt_pt)
+        print("x:", opt_pt[0], ", y:", opt_pt[1], ", z:", opt_pt[2])
 
 #        ty = y - cy
 #        tx = x - cx
 
         psi = np.arctan2(opt_pt[0], opt_pt[1])
         error = sawtooth(psi - psibar)
-        error_norm = norm(error)
+        n = abs(norm(error))
 
-        print("error: " + str(error))
+        print("error: " + str(n))
 
-        if (error > 0):
-            ardudrv.send_arduino_cmd_motor(serial_arduino, error_norm * 50, (1 -
-                error_norm) * 50)
-        elif (error < 0):
-            ardudrv.send_arduino_cmd_motor(serial_arduino, (1 - error_norm) *
-                    50, error_norm * 50)
-        else:
-            ardudrv.send_arduino_cmd_motor(serial_arduino, 0, 0)
+        sp_m = 35
+        ardudrv.send_arduino_cmd_motor(serial_arduino, n* sp_m, (1 - n) * sp_m)
+
         time.sleep(0.25)
