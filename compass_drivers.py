@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
-import paramiko
 
 # device address in the bus
 DEV_ADDR = 0x1e
@@ -29,28 +28,29 @@ TEMP_OUT_H = 0x2F
 
 INT_CFG    = 0X30
 INT_SRC    = 0X31
-
 INT_THS_L  = 0x32
 INT_THS_H  = 0x33
 
-# connecting to the bus
-bus = SMBus(1)
 
 # who am i information
-b = bus.read_byte_data(DEV_ADDR, WHO_AM_I)
-print("WHO AM I data:", hex(b))
+def who_am_i():
+    b = bus.read_byte_data(DEV_ADDR, WHO_AM_I)
+    print("WHO AM I data:", hex(b))
+
 
 # configuring the ctrl regs
-data1 = 0b10111100
-data2 = 0b00000000
-data3 = 0b00000000
-data4 = 0b00000100
-data5 = 0b01000000
-bus.write_byte_data(DEV_ADDR, CTRL_REG1, data1)
-bus.write_byte_data(DEV_ADDR, CTRL_REG2, data2)
-bus.write_byte_data(DEV_ADDR, CTRL_REG3, data3)
-bus.write_byte_data(DEV_ADDR, CTRL_REG4, data4)
-bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
+def init_compass():
+    data1 = 0b10111100
+    data2 = 0b00000000
+    data3 = 0b00000000
+    data4 = 0b00000100
+    data5 = 0b01000000
+    bus.write_byte_data(DEV_ADDR, CTRL_REG1, data1)
+    bus.write_byte_data(DEV_ADDR, CTRL_REG2, data2)
+    bus.write_byte_data(DEV_ADDR, CTRL_REG3, data3)
+    bus.write_byte_data(DEV_ADDR, CTRL_REG4, data4)
+    bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
+
 
 def read_compass():
     x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
@@ -78,6 +78,12 @@ def read_compass():
 
 
 if __name__ == "__main__":
+    # connecting to the bus
+    bus = SMBus(1)
+
+    who_am_i()
+
+    init_compass()
 
     with open("pts.txt", "w") as f:
         while True:
