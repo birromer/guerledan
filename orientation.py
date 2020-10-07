@@ -71,24 +71,60 @@ if __name__ == "__main__":
     serial_arduino, data_arduino = ardudrv.init_arduino_line()
 
     compass.init_compass()
+
     start_time = time.time()
+    state = "OFF"
+    event = "North"
+    psibar = 0
+    #psibar = desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
     while True:
         x, y, z = compass.read_compass()
         pt = np.array(([x, y, z]))
         pt = opt_pt(pt)
-        """get_time = time.time()
+        get_time = time.time()
         time_cur = get_time - start_time
-        print("time: ", time_cur)
-        if (time_cur < 15):
-                psibar = -pi/2  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
-        elif (time_cur < 30):
-                psibar = pi  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
-        elif (time_cur < 45):
-                psibar = pi/2  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
-        elif (time_cur < 60):
-                psibar = 0  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
-        else:
-            break"""
-        psibar = 0
+        print("state: " + state + ", event: " + event)
+        if (state == "OFF"):
+            start_time = time.time()
+            psibar = 0
+            event = "North"
+            state = "ON"
+        elif (state == "ON"):
+            if (event == "North"):
+                if (time_cur < 10):
+                    psibar = 0
+                else:
+                    psibar = -pi/2 + 0.2
+                    state = "WAIT"
+                    event = "West"
+            elif (event == "West"):
+                if (time_cur < 20):
+                    psibar = -pi/2 + 0.2
+                else:
+                    psibar = pi + 0.1
+                    state = "WAIT"
+                    event = "South"
+            elif (event == "East"):
+                if (time_cur < 20):
+                    psibar = pi/2
+                else:
+                    psibar = 0
+                    state = "WAIT"
+                    event = "North"
+            elif (event == "South"):
+                if (time_cur < 10):
+                    psibar = pi + 0.1
+                else:
+                    psibar = pi/2
+                    state = "WAIT"
+                    event = "East"
+        elif (state == "WAIT"): #speed should be decreased on wait
+            pt_x = pt[0]
+            pt_y = pt[1]
+            psi = np.arctan2(pt_y, pt_x)
+            if (sawtooth(psi - psibar) < 0.2):
+                state = "ON"
+                start_time = time.time()
+
         (command, power) = gen_command(pt, psibar)
-        send_command(command, 40, 30, serial_arduino, data_arduino, power)
+        send_command(command, 64, 59, serial_arduino, data_arduino, power)
