@@ -81,6 +81,7 @@ def init_acc_gyro():
     data8  = 0b10100101  # low pass enable for acc, !!!check that later!!!
     data9  = 0b00111000  # enable gyro axis
     data10 = 0b00111111  # enable acc axis and special functions
+
     bus.write_byte_data(DEV_ADDR, CTRL1_XL, data1)
     bus.write_byte_data(DEV_ADDR, CTRL2_G,  data2)
     bus.write_byte_data(DEV_ADDR, CTRL3_C,  data3)
@@ -122,9 +123,6 @@ def read_acc():
     if (x > 32767):
         x = x - 65536
 
-#    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
-#    print "X axis:", (x[0]*2**8 + x[1])
-
     y_h = bus.read_byte_data(DEV_ADDR, OUTY_H_XL)
     y_l = bus.read_byte_data(DEV_ADDR, OUTY_L_XL)
     y = y_h*2**8 + y_l
@@ -144,8 +142,8 @@ if __name__ == "__main__":
     who_am_i()
 
     init_acc_gyro()
-    gyro_f = open("gyro.txt","w")
-    acc_f = open("acc.txt","w")
+    gyro_f = open("../data/gyro.txt", "w")
+    acc_f = open("../data/acc.txt", "w")
 
     while True:
         gx, gy, gz = read_gyro()
@@ -154,6 +152,6 @@ if __name__ == "__main__":
         gyro_f.write("%d %d %d\n"%(gx, gy, gz))
         acc_f.write("%d %d %d\n"%(ax, ay, az))
 
-        print("Gyro -> X:", gx, "Y:", gy, "Z:", gz)
-#        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
+#        print("Gyro -> X:", gx, "Y:", gy, "Z:", gz)
+        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
         time.sleep(0.001)
