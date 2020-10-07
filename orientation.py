@@ -4,6 +4,9 @@ import drivers.compass_drivers as compass
 import numpy as np
 from math import pi
 
+def convert_to_degree(x):
+    return ((x*360 -180))
+
 def norm(x):
     return (x - pi)/(pi + pi)
 
@@ -43,28 +46,49 @@ def gen_command(readings, psibar):
 
     psi = np.arctan2(pt_y, pt_x)
     error = sawtooth(psi - psibar)
-
     n = abs(norm(error))
-    print(n)
-    on = lambda x: 1 if x > 0.5 else 0
+    def set_range(range_angle, angle):
+        if (angle > 0.5 + range_angle):
+            return 1
+        elif (angle < 0.5 - range_angle):
+            return 0
+        else:
+            return 0.5
+    return (set_range(0.0349066, n), n)
 
-    return on(n)
 
-
-def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, time=60):
-    ardudrv.send_arduino_cmd_motor(serial_arduino, cmd * lspeed, (1 - cmd) * rspeed)
-    #time.sleep(0.25)
-
+def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
+    if (cmd == 0):
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * ((0.5 -
+            power) + 1.5))
+    elif (cmd == 1):
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1.5 + power), 0)
+    elif (cmd == 0.5):
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.8, rspeed *
+                1.8)
 
 if __name__ == "__main__":
     serial_arduino, data_arduino = ardudrv.init_arduino_line()
 
-    psibar = 0  # desired heading (0 = north)
-
+    compass.init_compass()
+    start_time = time.time()
     while True:
         x, y, z = compass.read_compass()
         pt = np.array(([x, y, z]))
-        print(pt)
         pt = opt_pt(pt)
-        command = gen_command(pt, psibar)
-        send_command(command, 60, 60, serial_arduino, data_arduino)
+        """get_time = time.time()
+        time_cur = get_time - start_time
+        print("time: ", time_cur)
+        if (time_cur < 15):
+                psibar = -pi/2  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
+        elif (time_cur < 30):
+                psibar = pi  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
+        elif (time_cur < 45):
+                psibar = pi/2  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
+        elif (time_cur < 60):
+                psibar = 0  #desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
+        else:
+            break"""
+        psibar = 0
+        (command, power) = gen_command(pt, psibar)
+        send_command(command, 40, 30, serial_arduino, data_arduino, power)
