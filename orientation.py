@@ -10,7 +10,12 @@ def norm(x):
 def sawtooth(x):
     return (x+pi)%(2*pi)-pi
 
-def opt2(pt, x1, xm1, x2, x3):
+def opt_pt(pt):
+    x1 = np.array([900, -3950, 5540])
+    xm1 = np.array([7050, -2950, 5400])
+    x2 = np.array([4410, -6400, 5450])
+    x3 = np.array([3950, -3450, 2300])
+
     A = np.zeros((3,3))
     xv = np.array([x1,x2,x3])
     beta = 0.0000047
@@ -21,43 +26,45 @@ def opt2(pt, x1, xm1, x2, x3):
     A[:,1] = (x2 + b)/beta
     A[:,2] = (x3 + b)/beta
 
-    opt_pt = np.matmul(np.linalg.inv(A), (pt + b))
+    pt = np.matmul(np.linalg.inv(A), (pt + b))
 
-    return opt_pt
+    return pt
 
-def sending_command(serial_arduino, data_arduino, lspeed, rspeed, time=60):
-    x1 = np.array([900, -3950, 5540])
-    xm1 = np.array([7050, -2950, 5400])
-    x2 = np.array([4410, -6400, 5450])
-    x3 = np.array([3950, -3450, 2300])
+def g():  # get the readings from the sensors
+    x, y, z = compass.read_compass()
+    pt = np.array(([x, y, z]))
+    pt = opt_pt(pt)
+    return np.array([
+        [pt[0]]
+        [pt[1]]
+        [pt[2]]
+    ])
 
-    psibar = 0
+def gen_command(readings, psibar):
+    pt_x = readings[0]
+    pt_y = readings[1]
 
-    while (True):
-        x, y, z = compass.read_compass()
-        pt = np.array(([x, y, z]))
+    psi = np.arctan2(pt_x, pt_y)
+    error = sawtooth(psi - psibar)
 
-        opt_pt = opt2(pt, x1, xm1, x2, x3)
-        #print("x:", opt_pt[0], ", y:", opt_pt[1], ", z:", opt_pt[2])
+    n = abs(norm(error))
+    on = lambda x: 1 if x > 0.5 else 0
 
-        psi = np.arctan2(opt_pt[1], opt_pt[0])
-        error = sawtooth(psi - psibar)
-        n = abs(norm(error))
+    return on(n)
 
-        #print("error: " + str(error))
 
-        def bla(x):
-            if x > 0.5:
-                return 1
-            else:
-                return 0
-
-        ardudrv.send_arduino_cmd_motor(serial_arduino, bla(n) * lspeed, (1 -
-            bla(n)) * rspeed)
-
-        #time.sleep(0.25)
+def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, time=60):
+    ardudrv.send_arduino_cmd_motor(serial_arduino, command * lspeed, (1 - cmd) * rspeed)
+    #time.sleep(0.25)
 
 
 if __name__ == "__main__":
     serial_arduino, data_arduino = ardudrv.init_arduino_line()
-    sending_command(serial_arduino, data_arduino, 60, 60)
+
+    psibar = 0  # desired heading (0 = north)
+
+    readings = g()
+    command = gen_command(readings, psibar)
+
+    while True:
+        send_command(command, 60, 60, serial_arduino, data_arduino)
