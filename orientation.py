@@ -34,27 +34,25 @@ def g():  # get the readings from the sensors
     x, y, z = compass.read_compass()
     pt = np.array(([x, y, z]))
     pt = opt_pt(pt)
-    return np.array([
-        [pt[0]]
-        [pt[1]]
-        [pt[2]]
-    ])
+    return pt
+
 
 def gen_command(readings, psibar):
     pt_x = readings[0]
     pt_y = readings[1]
 
-    psi = np.arctan2(pt_x, pt_y)
+    psi = np.arctan2(pt_y, pt_x)
     error = sawtooth(psi - psibar)
 
     n = abs(norm(error))
+    print(n)
     on = lambda x: 1 if x > 0.5 else 0
 
     return on(n)
 
 
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, time=60):
-    ardudrv.send_arduino_cmd_motor(serial_arduino, command * lspeed, (1 - cmd) * rspeed)
+    ardudrv.send_arduino_cmd_motor(serial_arduino, cmd * lspeed, (1 - cmd) * rspeed)
     #time.sleep(0.25)
 
 
@@ -63,8 +61,10 @@ if __name__ == "__main__":
 
     psibar = 0  # desired heading (0 = north)
 
-    readings = g()
-    command = gen_command(readings, psibar)
-
     while True:
+        x, y, z = compass.read_compass()
+        pt = np.array(([x, y, z]))
+        print(pt)
+        pt = opt_pt(pt)
+        command = gen_command(pt, psibar)
         send_command(command, 60, 60, serial_arduino, data_arduino)
