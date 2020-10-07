@@ -58,10 +58,22 @@ FIFO_STATUS_4 = 0x3D
 FIFO_DATA_OUT_L = 0x3E
 FIFO_DATA_OUT_H = 0x3F
 
+#  interruptions control
+INT1_CTRL = 0x0D
+INT2_CTRL = 0x0E
 
-# connecting to the bus
+
+# access to special functions configuration
+FUNC_CFG_ACCESS = 0x01
+
+#  access to interruption status
+FUNC_SRC = 0x53
+
+#  significant motion threshold configuration
+SM_THS = 0x13
+
+## connecting to the bus ##
 bus = SMBus(1)
-
 
 # who am i information
 def who_am_i():
@@ -71,16 +83,18 @@ def who_am_i():
 
 # configuring the ctrl regs
 def init_acc_gyro():
-    data1  = 0b01010000  # 208hz acc, default, default
-    data2  = 0b01010000  # 208hz gyro, default, default
-    data3  = 0b00000000  # only updates after msb and lsb read
+    data1  = 0b10100111 
+    data2  = 0b10100000
+    data3  = 0b00000000
     data4  = 0b10000000
-    data5  = 0b00000000  # no rounding no self test
-    data6  = 0b00000000  # lots of disabled stuff and high performance active
-    data7  = 0b01110100  # high pass filter enable for gyro, limit 0.034hz
+    data5  = 0b01100100
+    data6  = 0b00100000
+    data7  = 0b00000000
     data8  = 0b10100101  # low pass enable for acc, !!!check that later!!!
     data9  = 0b00111000  # enable gyro axis
-    data10 = 0b00111111  # enable acc axis and special functions
+    data10 = 0b00111101  # enable acc axis and special functions
+
+    data_int1 = 0b01000000  # enable significant motion interruption
 
     bus.write_byte_data(DEV_ADDR, CTRL1_XL, data1)
     bus.write_byte_data(DEV_ADDR, CTRL2_G,  data2)
@@ -92,6 +106,8 @@ def init_acc_gyro():
     bus.write_byte_data(DEV_ADDR, CTRL8_XL, data8)
     bus.write_byte_data(DEV_ADDR, CTRL9_XL, data9)
     bus.write_byte_data(DEV_ADDR, CTRL10_C, data10)
+
+    bus.write_byte_data(DEV_ADDR, INT1_CTRL, data_int1)
 
 
 def read_gyro():
@@ -137,6 +153,15 @@ def read_acc():
 
     return x, y, z
 
+def is_significant_motion():
+    v = bus.read_byte_data(DEV_ADDR, FUNC_SRC)
+    desired = 0b00100000  # position of the significant motion
+    st = v & desired
+
+    if st != 0:
+        return True
+    else:
+        return False
 
 if __name__ == "__main__":
     who_am_i()
@@ -145,6 +170,10 @@ if __name__ == "__main__":
     gyro_f = open("../data/gyro.txt", "w")
     acc_f = open("../data/acc.txt", "w")
 
+    prev_ax = 0
+    prev_ay = 0
+    prev_az = 0
+
     while True:
         gx, gy, gz = read_gyro()
         ax, ay, az = read_acc()
@@ -152,6 +181,12 @@ if __name__ == "__main__":
         gyro_f.write("%d %d %d\n"%(gx, gy, gz))
         acc_f.write("%d %d %d\n"%(ax, ay, az))
 
+        if is_significant_motion():
+            print("significant motion")
+
+#        print("dif x:", ax - prev_ax)
+#        print("dif y:", ay - prev_ay)
+#        print("dif z:", az - prev_az)
+
 #        print("Gyro -> X:", gx, "Y:", gy, "Z:", gz)
-        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
-        time.sleep(0.001)
+#        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)

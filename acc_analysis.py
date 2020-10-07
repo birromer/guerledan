@@ -38,6 +38,14 @@ if __name__ == "__main__":
     ft1 = np.fft.fft(pts[0,:])
     ft2 = np.fft.fft(pts[1,:])
 
+
+    copy_x = pts[0,:].copy()
+    copy_y = pts[1,:].copy()
+    print(copy_x)
+
+    print(copy_x.sort())
+    print(copy_y.sort())
+
     base = np.arange(0,pts.shape[1])
 #    plt.plot(base, ft2, label="Y axis acc")
 #    plt.plot(base, ft1, label="X axis acc")
