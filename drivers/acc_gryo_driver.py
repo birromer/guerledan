@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
+import time
 
 # device address in the bus
 DEV_ADDR = 0x6b
@@ -8,28 +9,54 @@ DEV_ADDR = 0x6b
 # registers
 WHO_AM_I   = 0x0F
 
-CTRL_REG1  = 0x20
-CTRL_REG2  = 0x21
-CTRL_REG3  = 0x22
-CTRL_REG4  = 0x23
-CTRL_REG5  = 0x24
+#  fifo configuration
+CTRL_REG1  = 0x06
+CTRL_REG2  = 0x07
+CTRL_REG3  = 0x08
+CTRL_REG4  = 0x09
+CTRL_REG5  = 0x0A
 
-STATUS_REG = 0x27
+ORIENT_CFG_G = 0X0b
 
-OUT_X_L    = 0x28
-OUT_X_H    = 0x29
-OUT_Y_L    = 0x2A
-OUT_Y_H    = 0x2B
-OUT_Z_L    = 0x2C
-OUT_Z_H    = 0x2D
+#  acc and gyro control
+CTRL1_XL  = 0x10
+CTRL2_G   = 0x11
+CTRL3_C   = 0x11
+CTRL4_C   = 0x11
+CTRL5_C   = 0x11
+CTRL6_C   = 0x11
+CTRL7_G   = 0x11
+CTRL8_XL  = 0x11
+CTRL9_XL  = 0x11
+CTRL10_C  = 0x11
 
-TEMP_OUT_L = 0x2E
-TEMP_OUT_H = 0x2F
+STATUS_REG = 0x1E
 
-INT_CFG    = 0X30
-INT_SRC    = 0X31
-INT_THS_L  = 0x32
-INT_THS_H  = 0x33
+#  gyro output data
+OUTX_L_G = 0x22
+OUTX_H_G = 0x23
+OUTY_L_G = 0x24
+OUTY_H_G = 0x25
+OUTZ_L_G = 0x26
+OUTZ_H_G = 0x27
+
+#  acc ooutput data
+OUTX_L_XL = 0x28
+OUTX_H_XL = 0x29
+OUTY_L_XL = 0x2A
+OUTY_H_XL = 0x2B
+OUTZ_L_XL = 0x2C
+OUTZ_H_XL = 0x2D
+
+#  fifo status
+FIFO_STATUS_1 = 0x3A
+FIFO_STATUS_2 = 0x3B
+FIFO_STATUS_3 = 0x3C
+FIFO_STATUS_4 = 0x3D
+
+#  fifo output data
+FIFO_DATA_OUT_L = 0x3E
+FIFO_DATA_OUT_H = 0x3F
 
 
 # connecting to the bus
@@ -43,22 +70,54 @@ def who_am_i():
 
 
 # configuring the ctrl regs
-def init_compass():
-    data1 = 0b10111100
-    data2 = 0b00000000
-    data3 = 0b00000000
-    data4 = 0b00000100
-    data5 = 0b01000000
-    bus.write_byte_data(DEV_ADDR, CTRL_REG1, data1)
-    bus.write_byte_data(DEV_ADDR, CTRL_REG2, data2)
-    bus.write_byte_data(DEV_ADDR, CTRL_REG3, data3)
-    bus.write_byte_data(DEV_ADDR, CTRL_REG4, data4)
-    bus.write_byte_data(DEV_ADDR, CTRL_REG5, data5)
+def init_acc_gyro():
+    data1  = 0b01010000  # 208hz acc, default, default
+    data2  = 0b01010000  # 208hz gyro, default, default
+    data3  = 0b00000000  # only updates after msb and lsb read
+    data4  = 0b10000000
+    data5  = 0b00000000  # no rounding no self test
+    data6  = 0b00000000  # lots of disabled stuff and high performance active
+    data7  = 0b01110100  # high pass filter enable for gyro, limit 0.034hz
+    data8  = 0b10100101  # low pass enable for acc, !!!check that later!!!
+    data9  = 0b00111000  # enable gyro axis
+    data10 = 0b00111111  # enable acc axis and special functions
+    bus.write_byte_data(DEV_ADDR, CTRL1_XL, data1)
+    bus.write_byte_data(DEV_ADDR, CTRL2_G,  data2)
+    bus.write_byte_data(DEV_ADDR, CTRL3_C,  data3)
+    bus.write_byte_data(DEV_ADDR, CTRL4_C,  data4)
+    bus.write_byte_data(DEV_ADDR, CTRL5_C,  data5)
+    bus.write_byte_data(DEV_ADDR, CTRL6_C,  data6)
+    bus.write_byte_data(DEV_ADDR, CTRL7_G,  data7)
+    bus.write_byte_data(DEV_ADDR, CTRL8_XL, data8)
+    bus.write_byte_data(DEV_ADDR, CTRL9_XL, data9)
+    bus.write_byte_data(DEV_ADDR, CTRL10_C, data10)
 
 
-def read_compass():
-    x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
-    x_l = bus.read_byte_data(DEV_ADDR, OUT_X_L)
+def read_gyro():
+    x_h = bus.read_byte_data(DEV_ADDR, OUTX_H_G)
+    x_l = bus.read_byte_data(DEV_ADDR, OUTX_L_G)
+    x = x_h*2**8 + x_l
+    if (x > 32767):
+        x = x - 65536
+
+    y_h = bus.read_byte_data(DEV_ADDR, OUTY_H_G)
+    y_l = bus.read_byte_data(DEV_ADDR, OUTY_L_G)
+    y = y_h*2**8 + y_l
+    if (y > 32767):
+        y = y - 65536
+
+    z_h = bus.read_byte_data(DEV_ADDR, OUTZ_H_G)
+    z_l = bus.read_byte_data(DEV_ADDR, OUTZ_L_G)
+    z = z_h*2**8 + z_l
+    if (z > 32767):
+        z = z - 65536
+
+    return x, y, z
+
+
+def read_acc():
+    x_h = bus.read_byte_data(DEV_ADDR, OUTX_H_XL)
+    x_l = bus.read_byte_data(DEV_ADDR, OUTX_L_XL)
     x = x_h*2**8 + x_l
     if (x > 32767):
         x = x - 65536
@@ -66,14 +125,14 @@ def read_compass():
 #    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
 #    print "X axis:", (x[0]*2**8 + x[1])
 
-    y_h = bus.read_byte_data(DEV_ADDR, OUT_Y_H)
-    y_l = bus.read_byte_data(DEV_ADDR, OUT_Y_L)
+    y_h = bus.read_byte_data(DEV_ADDR, OUTY_H_XL)
+    y_l = bus.read_byte_data(DEV_ADDR, OUTY_L_XL)
     y = y_h*2**8 + y_l
     if (y > 32767):
         y = y - 65536
 
-    z_h = bus.read_byte_data(DEV_ADDR, OUT_Z_H)
-    z_l = bus.read_byte_data(DEV_ADDR, OUT_Z_L)
+    z_h = bus.read_byte_data(DEV_ADDR, OUTZ_H_XL)
+    z_l = bus.read_byte_data(DEV_ADDR, OUTZ_L_XL)
     z = z_h*2**8 + z_l
     if (z > 32767):
         z = z - 65536
@@ -84,10 +143,17 @@ def read_compass():
 if __name__ == "__main__":
     who_am_i()
 
-#    init_compass()
-#
-#    with open("../data/pts.txt", "w") as f:
-#        while True:
-#            x, y, z = read_compass()
-#            f.write("%d %d %d\n"%(x, y, z))
-#            print("X:", x, "Y:", y, "Z:", z)
+    init_acc_gyro()
+    gyro_f = open("gyro.txt","w")
+    acc_f = open("acc.txt","w")
+
+    while True:
+        gx, gy, gz = read_gyro()
+        ax, ay, az = read_acc()
+
+        gyro_f.write("%d %d %d\n"%(gx, gy, gz))
+        acc_f.write("%d %d %d\n"%(ax, ay, az))
+
+        print("Gyro -> X:", gx, "Y:", gy, "Z:", gz)
+#        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
+        time.sleep(0.001)
