@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
+import time
 
 # device address in the bus
 DEV_ADDR = 0x6b
@@ -93,23 +94,20 @@ def init_acc_gyro():
 
 
 def read_gyro():
-    x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
-    x_l = bus.read_byte_data(DEV_ADDR, OUT_X_L)
+    x_h = bus.read_byte_data(DEV_ADDR, OUTX_H_G)
+    x_l = bus.read_byte_data(DEV_ADDR, OUTX_L_G)
     x = x_h*2**8 + x_l
     if (x > 32767):
         x = x - 65536
 
-#    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
-#    print "X axis:", (x[0]*2**8 + x[1])
-
-    y_h = bus.read_byte_data(DEV_ADDR, OUT_Y_H)
-    y_l = bus.read_byte_data(DEV_ADDR, OUT_Y_L)
+    y_h = bus.read_byte_data(DEV_ADDR, OUTY_H_G)
+    y_l = bus.read_byte_data(DEV_ADDR, OUTY_L_G)
     y = y_h*2**8 + y_l
     if (y > 32767):
         y = y - 65536
 
-    z_h = bus.read_byte_data(DEV_ADDR, OUT_Z_H)
-    z_l = bus.read_byte_data(DEV_ADDR, OUT_Z_L)
+    z_h = bus.read_byte_data(DEV_ADDR, OUTZ_H_G)
+    z_l = bus.read_byte_data(DEV_ADDR, OUTZ_L_G)
     z = z_h*2**8 + z_l
     if (z > 32767):
         z = z - 65536
@@ -118,8 +116,8 @@ def read_gyro():
 
 
 def read_acc():
-    x_h = bus.read_byte_data(DEV_ADDR, OUT_X_H)
-    x_l = bus.read_byte_data(DEV_ADDR, OUT_X_L)
+    x_h = bus.read_byte_data(DEV_ADDR, OUTX_H_XL)
+    x_l = bus.read_byte_data(DEV_ADDR, OUTX_L_XL)
     x = x_h*2**8 + x_l
     if (x > 32767):
         x = x - 65536
@@ -127,14 +125,14 @@ def read_acc():
 #    x = bus.read_i2c_block_data(DEV_ADDR, OUT_X_H, 2)
 #    print "X axis:", (x[0]*2**8 + x[1])
 
-    y_h = bus.read_byte_data(DEV_ADDR, OUT_Y_H)
-    y_l = bus.read_byte_data(DEV_ADDR, OUT_Y_L)
+    y_h = bus.read_byte_data(DEV_ADDR, OUTY_H_XL)
+    y_l = bus.read_byte_data(DEV_ADDR, OUTY_L_XL)
     y = y_h*2**8 + y_l
     if (y > 32767):
         y = y - 65536
 
-    z_h = bus.read_byte_data(DEV_ADDR, OUT_Z_H)
-    z_l = bus.read_byte_data(DEV_ADDR, OUT_Z_L)
+    z_h = bus.read_byte_data(DEV_ADDR, OUTZ_H_XL)
+    z_l = bus.read_byte_data(DEV_ADDR, OUTZ_L_XL)
     z = z_h*2**8 + z_l
     if (z > 32767):
         z = z - 65536
@@ -157,4 +155,5 @@ if __name__ == "__main__":
         acc_f.write("%d %d %d\n"%(ax, ay, az))
 
         print("Gyro -> X:", gx, "Y:", gy, "Z:", gz)
-        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
+#        print("Acc  -> X:", ax, "Y:", ay, "Z:", az)
+        time.sleep(0.001)
