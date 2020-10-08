@@ -35,26 +35,33 @@ if __name__ == "__main__":
 
 #    plot_scatter(ax, pts[0,:], pts[1,:], pts[2,:])
 
-    ft1 = np.fft.fft(pts[0,:])
-    ft2 = np.fft.fft(pts[1,:])
-
-
-    copy_x = pts[0,:].copy()
-    copy_y = pts[1,:].copy()
-    print(copy_x)
-
-    print(copy_x.sort())
-    print(copy_y.sort())
+#    ft1 = np.fft.fft(pts[0,:])
+#    ft2 = np.fft.fft(pts[1,:])
+#
+#    copy_x = pts[0,:].copy()
+#    copy_y = pts[1,:].copy()
+#    print(copy_x)
+#
+#    print(copy_x.sort())
+#    print(copy_y.sort())
 
     base = np.arange(0,pts.shape[1])
 #    plt.plot(base, ft2, label="Y axis acc")
 #    plt.plot(base, ft1, label="X axis acc")
 
+
+    print(pts.shape)
+    s = lambda x: 10000 if abs(x) > 1300 else 0
+    q = lambda x : x**2
+    print(pts.shape)
+
+    plt.plot(base, list(map(s, pts[0,:])), label="X axis choch")
+    plt.plot(base, list(map(s, pts[1,:])), label="Y axis choch")
     plt.plot(base, pts[0,:], label="X axis acc")
     plt.plot(base, pts[1,:], label="Y axis acc")
 #    plt.plot(base, pts[2,:], label="Z axis acc")
-
+#   
     plt.xlabel('axis')
-    plt.ylabel('freq')
+    plt.ylabel('acc')
     plt.legend()
     plt.show()
