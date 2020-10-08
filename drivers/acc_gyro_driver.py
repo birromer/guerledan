@@ -163,7 +163,18 @@ def is_significant_motion():
     else:
         return False
 
+
+def is_bump():
+    bump = lambda x: True if abs(ax) > 1500 else False
+#    prev_bump = # put the timestamp to test if bump is recent
+    return bump(ax) or bump(ay)
+
+ax, ay, az = 0, 0, 0
+
+
 if __name__ == "__main__":
+    prev_bump_t = 0
+
     who_am_i()
 
     init_acc_gyro()
@@ -183,6 +194,10 @@ if __name__ == "__main__":
 
         if is_significant_motion():
             print("significant motion")
+
+        if is_bump():
+            print("BUMP!")
+            print()
 
 #        print("dif x:", ax - prev_ax)
 #        print("dif y:", ay - prev_ay)
