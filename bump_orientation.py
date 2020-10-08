@@ -61,9 +61,9 @@ def gen_command(readings, psibar):
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
     if (cmd == 0):
         ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * ((0.5 -
-            power) + 1.5))
+            power) + 1))
     elif (cmd == 1):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1.5 + power), 0)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1 + power), 0)
     elif (cmd == 0.5):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.8, rspeed *
                 1.8)
@@ -100,37 +100,36 @@ if __name__ == "__main__":
 
     start_time = time.time()
     state = "OFF"
-    event = "North"
-    psibar = 0.1
+    event = "None"
+    psibar = 0
     #psibar = desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
     i = 0
     while True:
         x, y, z = compass.read_compass()
         pt = np.array(([x, y, z]))
         pt = opt_pt(pt)
-        get_time = time.time()
-        time_cur = get_time - start_time
-        #print("state: " + state + ", event: " + event)
         if (state == "OFF"):
-            start_time = time.time()
             psibar = 0
-            event = "Forward"
-            state = "ON"
+            event = "None"
+            state = "WAIT"
+            print("WAIT STATE")
         elif (state == "ON"):
             if (event == "Forward"):
                 if (acc.is_bump(bump_thresh)):
                     i += 1
-                    print("bump " + str(i))
-                    psibar += 0,698132
+                    print("-------> bump " + str(i))
+                    psibar += pi/2
+                    psibar %= 2*pi
                     state = "WAIT"
+                    print("WAIT STATE, go to:", psibar*57.2958)
         elif (state == "WAIT"): #speed should be decreased on wait
             pt_x = pt[0]
             pt_y = pt[1]
             psi = np.arctan2(pt_y, pt_x)
-            if (sawtooth(psi - psibar) < 0.2):
+            if (abs(sawtooth(psi - psibar)) < 0.05):
                 state = "ON"
                 event = "Forward"
-                start_time = time.time()
+                print("ON STATE")
 
         (command, power) = gen_command(pt, psibar)
         send_command(command, cmdr, cmdl, serial_arduino, data_arduino, power)

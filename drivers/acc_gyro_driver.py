@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
-import arduino_driver_py3 as ardudrv
+import drivers.arduino_driver_py3 as ardudrv
 import time
 import sys
 
@@ -169,11 +169,10 @@ def is_significant_motion():
 
 
 def is_bump(thresh):
-    bump = lambda x: True if abs(x) > thresh else False
+    ax, ay, az = read_acc()
+    bump = lambda x: True if abs(x) > int(thresh) else False
 #    prev_bump = # put the timestamp to test if bump is recent
     return bump(ax) or bump(ay)
-
-
 
 
 if __name__ == "__main__":
