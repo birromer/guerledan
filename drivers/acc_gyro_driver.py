@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 from smbus import SMBus
+import arduino_driver_py3 as ardudrv
 import time
+import sys
+
+ax, ay, az = 0, 0, 0
 
 # device address in the bus
 DEV_ADDR = 0x6b
@@ -164,16 +168,17 @@ def is_significant_motion():
         return False
 
 
-def is_bump():
-    bump = lambda x: True if abs(ax) > 1500 else False
+def is_bump(thresh):
+    bump = lambda x: True if abs(x) > thresh else False
 #    prev_bump = # put the timestamp to test if bump is recent
     return bump(ax) or bump(ay)
 
-ax, ay, az = 0, 0, 0
+
 
 
 if __name__ == "__main__":
     prev_bump_t = 0
+    bump_thresh = int(sys.argv[1])
 
     who_am_i()
 
@@ -185,7 +190,11 @@ if __name__ == "__main__":
     prev_ay = 0
     prev_az = 0
 
+    serial_arduino, data_arduino = ardudrv.init_arduino_line()
+
     while True:
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 34, 29)
+
         gx, gy, gz = read_gyro()
         ax, ay, az = read_acc()
 
@@ -195,9 +204,10 @@ if __name__ == "__main__":
         if is_significant_motion():
             print("significant motion")
 
-        if is_bump():
+        if is_bump(bump_thresh):
             print("BUMP!")
             print()
+
 
 #        print("dif x:", ax - prev_ax)
 #        print("dif y:", ay - prev_ay)

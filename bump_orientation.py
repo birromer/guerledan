@@ -1,4 +1,5 @@
 import time
+import sys
 import drivers.arduino_driver_py3 as ardudrv
 import drivers.compass_drivers as compass
 import numpy as np
@@ -68,7 +69,32 @@ def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=
                 1.8)
 
 if __name__ == "__main__":
+    cmdl = 20
+    cmdr = 20
+    spd = 200  # ticks/s
+    thresh_bump = 1500
+
+    try:
+        thresh_bump = int(sys.argv[1])
+    except:
+        pass
+    try:
+        cmdl = int(sys.argv[3])
+        cmdr = cmdl
+    except:
+        pass
+    try:
+        cmdr = int(sys.argv[4])
+    except:
+        pass
+    try:
+        spd = int(sys.argv[2])
+    except:
+        pass
+
+
     serial_arduino, data_arduino = ardudrv.init_arduino_line()
+    bump_thresh = sys.argv[1]
 
     compass.init_compass()
 
@@ -92,7 +118,7 @@ if __name__ == "__main__":
             state = "ON"
         elif (state == "ON"):
             if (event == "Forward"):
-                if (acc.is_bump()):
+                if (acc.is_bump(bump_thresh)):
                     i += 1
                     print("bump " + str(i))
                     psibar += 0,698132
@@ -107,4 +133,4 @@ if __name__ == "__main__":
                 start_time = time.time()
 
         (command, power) = gen_command(pt, psibar)
-        send_command(command, 34, 29, serial_arduino, data_arduino, power)
+        send_command(command, cmdr, cmdl, serial_arduino, data_arduino, power)
