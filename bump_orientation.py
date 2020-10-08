@@ -101,7 +101,7 @@ if __name__ == "__main__":
     start_time = time.time()
     state = "OFF"
     event = "None"
-    psibar = 0
+    psibar = 0.0
     #psibar = desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
     i = 0
     while True:
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         pt = np.array(([x, y, z]))
         pt = opt_pt(pt)
         if (state == "OFF"):
-            psibar = 0
+            psibar = 0.0
             event = "None"
             state = "WAIT"
             print("WAIT STATE")
