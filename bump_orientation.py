@@ -48,7 +48,7 @@ def gen_command(readings, psibar, derivate=-10.0):
 
     psi = np.arctan2(pt_y, pt_x)
     if (derivate != -10.0):
-        error = sawtooth(psi - psibar) + sin(psi - derivate)
+        error = sawtooth(psi - psibar) + np.sin(psi - derivate)
     else:
         error = sawtooth(psi - psibar)
     n = abs(norm(error))
@@ -62,13 +62,23 @@ def gen_command(readings, psibar, derivate=-10.0):
     return (set_range(0.0174533, n), n)
 
 
+def send_prop_command(side, sum_speed, power, seria_artudino):
+    print("power:", power)
+    if (side == 0):  # it is too much to the right
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, sum_speed * 1.2)
+    elif (side == 1):  # it is too much to the left
+        ardudrv.send_arduino_cmd_motor(serial_arduino, sum_speed * 1.2, 0)
+    elif (side == 0.5):
+        ardudrv.send_arduino_cmd_motor(serial_arduino, sum_speed * 2, sum_speed * 2)
+
+
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
     if (cmd == 0):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * 1.2)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed)
     elif (cmd == 1):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.2, 0)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed, 0)
     elif (cmd == 0.5):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2, rspeed * 2)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.2, rspeed * 1.2)
 
 if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     cmdl = 20
