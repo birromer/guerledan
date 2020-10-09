@@ -60,13 +60,11 @@ def gen_command(readings, psibar):
 
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
     if (cmd == 0):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * ((0.5 -
-            power) + 1))
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * ((0.5 - power) + 1))
     elif (cmd == 1):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1 + power), 0)
     elif (cmd == 0.5):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.8, rspeed *
-                1.8)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.8, rspeed * 1.8)
 
 if __name__ == "__main__":
     cmdl = 20
