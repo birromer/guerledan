@@ -68,7 +68,7 @@ def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=
     elif (cmd == 1):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.2, 0)
     elif (cmd == 0.5):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2.5, rspeed * 2.5)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2, rspeed * 2)
 
 if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     cmdl = 20
@@ -97,7 +97,7 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
 
     serial_arduino, data_arduino = ardudrv.init_arduino_line()
     bump_thresh = sys.argv[1]
-
+    acc.init_acc_gyro()
     compass.init_compass()
 
     start_time = time.time()
