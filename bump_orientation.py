@@ -55,7 +55,7 @@ def gen_command(readings, psibar):
             return 0
         else:
             return 0.5
-    return (set_range(0.0349066, n), n)
+    return (set_range(0.0174533, n), n)
 
 
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
@@ -65,8 +65,7 @@ def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=
     elif (cmd == 1):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1 + power), 0)
     elif (cmd == 0.5):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.8, rspeed *
-                1.8)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2.5, rspeed * 2.5)
 
 if __name__ == "__main__":
     cmdl = 20
@@ -118,7 +117,7 @@ if __name__ == "__main__":
                 if (acc.is_bump(bump_thresh)):
                     i += 1
                     print("-------> bump " + str(i))
-                    psibar += pi/2
+                    psibar += pi/3
                     psibar %= 2*pi
                     state = "WAIT"
                     print("WAIT STATE, go to:", psibar*57.2958)
