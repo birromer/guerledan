@@ -59,7 +59,7 @@ def gen_command(readings, psibar, derivate=-10.0):
             return 0
         else:
             return 0.5
-    return (set_range(0.0174533, n), n)
+    return (set_range(0.0174533, n), n, psi)
 
 
 def send_prop_command(side, sum_speed, power, seria_artudino):
@@ -83,7 +83,7 @@ def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=
 if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     cmdl = 20
     cmdr = 20
-    spd = 200  # ticks/s
+    psibar = 0  # ticks/s
     thresh_bump = 1500
 
     try:
@@ -91,16 +91,16 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     except:
         pass
     try:
-        cmdl = int(sys.argv[3])
+        cmdl = int(sys.argv[2])
         cmdr = cmdl
     except:
         pass
     try:
-        cmdr = int(sys.argv[4])
+        cmdr = int(sys.argv[3])
     except:
         pass
     try:
-        spd = int(sys.argv[2])
+        psibar = int(sys.argv[4]) * 0.0174533
     except:
         pass
 
@@ -113,7 +113,6 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     start_time = time.time()
     state = "OFF"
     event = "None"
-    psibar = 0.0
     old_psi = -10.0
     #psibar = desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
     i = 0
@@ -122,7 +121,7 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
         pt = np.array(([x, y, z]))
         pt = opt_pt(pt)
         if (state == "OFF"):
-            psibar = -pi/2
+            psibar = pi/4
             old_psi = -10.0
             event = "None"
             state = "WAIT"
@@ -131,11 +130,10 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
             if (event == "Forward"):
                 if (acc.is_bump(bump_thresh)):
                     ardudrv.send_arduino_cmd_motor(serial_arduino, 0, 0)
-                    time.sleep(2)
+                    time.sleep(4)
                     i += 1
                     print("-------> bump " + str(i))
-                    old_psi = psibar
-                    psibar += pi/3
+                    psibar += pi/2
                     psibar %= 2*pi
                     state = "WAIT"
                     print("WAIT STATE, go to:", psibar*57.2958)
@@ -148,5 +146,5 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
                 event = "Forward"
                 print("ON STATE")
 
-        (command, power) = gen_command(pt, psibar, )
+        (command, power, old_psi) = gen_command(pt, psibar, old_psi )
         send_command(command, cmdr, cmdl, serial_arduino, data_arduino, power)
