@@ -60,10 +60,9 @@ def gen_command(readings, psibar):
 
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
     if (cmd == 0):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * ((0.5 -
-            power) + 1))
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * 1.5)
     elif (cmd == 1):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * (1 + power), 0)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.5, 0)
     elif (cmd == 0.5):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2.5, rspeed * 2.5)
 
@@ -108,16 +107,18 @@ if __name__ == "__main__":
         pt = np.array(([x, y, z]))
         pt = opt_pt(pt)
         if (state == "OFF"):
-            psibar = 0.0
+            psibar = -pi/2
             event = "None"
             state = "WAIT"
             print("WAIT STATE")
         elif (state == "ON"):
             if (event == "Forward"):
                 if (acc.is_bump(bump_thresh)):
+                    ardudrv.send_arduino_cmd_motor(serial_arduino, 0, 0)
+                    time.sleep(2)
                     i += 1
                     print("-------> bump " + str(i))
-                    psibar += pi/3
+                    psibar += pi
                     psibar %= 2*pi
                     state = "WAIT"
                     print("WAIT STATE, go to:", psibar*57.2958)
