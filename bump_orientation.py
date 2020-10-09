@@ -5,6 +5,7 @@ import drivers.compass_drivers as compass
 import numpy as np
 from math import pi
 import drivers.acc_gyro_driver as acc
+
 def convert_to_degree(x):
     return ((x*360 -180))
 
@@ -60,13 +61,13 @@ def gen_command(readings, psibar):
 
 def send_command(cmd, lspeed, rspeed, serial_arduino, data_arduino, power ,time=60):
     if (cmd == 0):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * 1.5)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, 0, rspeed * 1.2)
     elif (cmd == 1):
-        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.5, 0)
+        ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 1.2, 0)
     elif (cmd == 0.5):
         ardudrv.send_arduino_cmd_motor(serial_arduino, lspeed * 2.5, rspeed * 2.5)
 
-if __name__ == "__main__":
+if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     cmdl = 20
     cmdr = 20
     spd = 200  # ticks/s
@@ -118,7 +119,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     i += 1
                     print("-------> bump " + str(i))
-                    psibar += pi
+                    psibar += pi/3
                     psibar %= 2*pi
                     state = "WAIT"
                     print("WAIT STATE, go to:", psibar*57.2958)
