@@ -42,12 +42,15 @@ def g():  # get the readings from the sensors
     return pt
 
 
-def gen_command(readings, psibar):
+def gen_command(readings, psibar, derivate=-10.0):
     pt_x = readings[0]
     pt_y = readings[1]
 
     psi = np.arctan2(pt_y, pt_x)
-    error = sawtooth(psi - psibar)
+    if (derivate != -10.0):
+        error = sawtooth(psi - psibar) + sin(psi - derivate)
+    else:
+        error = sawtooth(psi - psibar)
     n = abs(norm(error))
     def set_range(range_angle, angle):
         if (angle > 0.5 + range_angle):
@@ -101,6 +104,7 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
     state = "OFF"
     event = "None"
     psibar = 0.0
+    old_psi = -10.0
     #psibar = desired heading (0 = north) (pi/2 = east) (pi = south) (-pi/2 = west)
     i = 0
     while True:
@@ -109,6 +113,7 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
         pt = opt_pt(pt)
         if (state == "OFF"):
             psibar = -pi/2
+            old_psi = -10.0
             event = "None"
             state = "WAIT"
             print("WAIT STATE")
@@ -119,6 +124,7 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
                     time.sleep(2)
                     i += 1
                     print("-------> bump " + str(i))
+                    old_psi = psibar
                     psibar += pi/3
                     psibar %= 2*pi
                     state = "WAIT"
@@ -132,5 +138,5 @@ if __name__ == "__main__": #thresh = 12 000 cmdl = 50 cmdr = 50
                 event = "Forward"
                 print("ON STATE")
 
-        (command, power) = gen_command(pt, psibar)
+        (command, power) = gen_command(pt, psibar, )
         send_command(command, cmdr, cmdl, serial_arduino, data_arduino, power)
