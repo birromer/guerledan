@@ -1,6 +1,4 @@
-#+TITLE:Readme
-
-* Guerledan experimental class at ENSTA Bretagne - 2020
+# Guerledan experimental class at ENSTA Bretagne - 2020
 
 The activities followed were:
 
